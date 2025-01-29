@@ -1,0 +1,108 @@
+
+; Author    KMS - Martin Dubois, P. Eng.
+; Copyright (C) 2025 KMS
+; License   http://www.apache.org/licenses/LICENSE-2.0
+; Product   DrvDMA-Samples
+; File      D_NDIS/D_NDIS.inf
+
+; Reference
+; https://learn.microsoft.com/en-us/windows-hardware/drivers/netcx/inf-files-for-netadaptercx-client-drivers
+; https://github.com/microsoft/NetAdapter-Cx-Driver-Samples/blob/release_2004/RtEthSample/RtEthSample.inx
+
+[Version]
+Signature   = "$WINDOWS NT$"
+Class       = Net
+ClassGuid   = {4d36e972-e325-11ce-bfc1-08002be10318}
+PnpLockdown = 1
+Provider    = %ManufacturerName%
+CatalogFile = D_NDIS.cat
+DriverVer   = 01/22/2025,2.1.0.0
+
+; ===== Files ===============================================================
+
+; References
+; https://learn.microsoft.com/en-us/windows-hardware/drivers/install/using-dirids
+
+[DestinationDirs]
+DefaultDestDir = 13
+
+[SourceDisksNames]
+1 = %DiskName%, , , ""
+
+[SourceDisksFiles]
+D_NDIS.sys = 1, ,
+
+; ===== Device list =========================================================
+
+; References
+; https://learn.microsoft.com/en-us/windows-hardware/drivers/install/inf-controlflags-section
+
+[Manufacturer]
+%ManufacturerName% = Standard,NT$ARCH$.10.0...16299
+
+[Standard.NT$ARCH$.10.0...16299]
+%DeviceDesc% = Device, PCI\VEN_10EE&DEV_9034
+
+; ===== D_NDIS device =======================================================
+
+; Reference
+; https://learn.microsoft.com/en-us/windows-hardware/drivers/network/ddinstall-section-in-a-network-inf-file
+; https://learn.microsoft.com/en-us/windows-hardware/drivers/install/inf-featurescore-directive
+
+[Device.NT]
+*AccessType               = 2
+*ConnectionType           = 1
+*DirectionType            = 0
+*HardwareLoopback         = 0
+*IfConnectorPresent       = 0
+*IfType                   = 6
+*MediaType                = 0
+*PhysicalMediaType        = 14
+AddReg                    = Device.AddReg
+BusType                   = 5
+Characteristics           = 0x04
+CopyFiles                 = File_Copy
+FeatureScore              = 0xfe
+NumberOfNetworkInterfaces = 1
+
+[Device.AddReg]
+HKR, Ndi           , Service   , 0, %ServiceName%
+HKR, Ndi\Interfaces, UpperRange, 0, "ndis5"
+HKR, Ndi\Interfaces, LowerRange, 0, "ethernet"
+
+[File_Copy]
+D_NDIS.sys, , , 2
+
+; ===== Service =============================================================
+
+[Device.NT.Services]
+AddService = %ServiceName%, 2, Device.Service
+
+[Device.Service]
+DisplayName    = %ServiceDesc%
+ServiceType    = 1
+StartType      = 3
+ErrorControl   = 1
+ServiceBinary  = %13%\D_NDIS.sys
+LoadOrderGroup = NDIS
+AddReg         = Device.Service.AddReg
+
+[Device.Service.AddReg]
+HKR, , BootFlags, 0x00010001, 1
+
+; ===== WDF =================================================================
+
+[Device.NT.Wdf]
+KmdfService = %ServiceName%, Device_wdfsect
+
+[Device_wdfsect]
+KmdfLibraryVersion = $KMDFVERSION$
+
+; ===== Strings =============================================================
+
+[Strings]
+ManufacturerName = "KMS"
+DiskName         = "D_NDIS Installation Disk"
+DeviceDesc       = "D_NDIS Device"
+ServiceDesc      = "D_NDIS Service"
+ServiceName      = "D_NDIS"

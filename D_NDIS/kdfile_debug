@@ -1,0 +1,11 @@
+
+# Author    KMS - Martin Dubois, P. Eng.
+# Copyright (C) 2025 KMS
+# Product   DrvDMA-Samples
+# File      D_NDIS/kdfile_debug
+
+# .kdfiles C:\_VC\DrvDMA-Samples\D_NDIS\kdfile_debug
+
+map
+D_NDIS.sys
+C:\_VC\DrvDMA-Samples\x64\Debug\D_NDIS.sys
