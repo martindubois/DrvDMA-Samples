@@ -9,6 +9,13 @@
 
 #define _KMS_WINDOWS_
 
+// Define _DEVICE_ or _SOFT_FUNC_
+// _DEVICE_    The device is enumerated by the PCI sub system
+// _SOFT_FUNC_ The DrvDMA driver enumerate the configured soft function
+
+// #define _DEVICE_
+#define _SOFT_FUNC_
+
 // ===== WDM ================================================================
 
 #define INITGUID

@@ -41,7 +41,8 @@ D_NDIS.sys = 1, ,
 %ManufacturerName% = Standard,NT$ARCH$.10.0...16299
 
 [Standard.NT$ARCH$.10.0...16299]
-%DeviceDesc% = Device, PCI\VEN_10EE&DEV_9034
+; %DeviceDesc% = Device, PCI\VEN_10EE&DEV_9034
+%DeviceDesc% = Device, {4667531E-5B2E-4AF9-BCCF-D594135D5758}\VEN_0000&DEV_0000
 
 ; ===== D_NDIS device =======================================================
 
@@ -59,7 +60,7 @@ D_NDIS.sys = 1, ,
 *MediaType                = 0
 *PhysicalMediaType        = 14
 AddReg                    = Device.AddReg
-BusType                   = 5
+BusType                   = 15
 Characteristics           = 0x04
 CopyFiles                 = File_Copy
 FeatureScore              = 0xfe
