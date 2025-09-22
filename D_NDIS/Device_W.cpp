@@ -51,7 +51,11 @@ WDF_DECLARE_CONTEXT_TYPE_WITH_NAME(DeviceContext, GetDeviceContext);
 // Static function declarations
 // //////////////////////////////////////////////////////////////////////////
 
-static void Hardware_Prepare(void* aSender, DrvDMA_CallbackType aType, void* aContext);
+// ===== Entry points =======================================================
+
+static EVT_WDF_DEVICE_D0_ENTRY         D0Entry;
+static EVT_WDF_DEVICE_D0_EXIT          D0Exit;
+static EVT_WDF_DEVICE_PREPARE_HARDWARE PrepareHardware;
 
 // Functions
 // //////////////////////////////////////////////////////////////////////////
@@ -64,13 +68,30 @@ NTSTATUS Device_Create(WDFDEVICE_INIT* aInit)
 
     NetDeviceInitConfig(aInit);
 
+    WDF_PNPPOWER_EVENT_CALLBACKS lPnpPower;
+
+    WDF_PNPPOWER_EVENT_CALLBACKS_INIT(&lPnpPower);
+
+    lPnpPower.EvtDeviceD0Entry         = D0Entry;
+    lPnpPower.EvtDeviceD0Exit          = D0Exit;
+    lPnpPower.EvtDevicePrepareHardware = PrepareHardware;
+
     #ifdef _DEVICE_
+
         DrvDMA_Device_InitDeviceInit(aInit);
+
+        lPnpPower.EvtDeviceD0Exit          = DrvDMA_D0Exit;
+        lPnpPower.EvtDeviceReleaseHardware = DrvDMA_ReleaseHardware;
+
     #endif
 
     #ifdef _SOFT_FUNC_
+
         DrvDMA_SoftFunc_InitDeviceInit(aInit);
+
     #endif
+
+    WdfDeviceInitSetPnpPowerEventCallbacks(aInit, &lPnpPower);
 
     WDF_OBJECT_ATTRIBUTES lAttr;
 
@@ -100,20 +121,10 @@ NTSTATUS Device_Create(WDFDEVICE_INIT* aInit)
 
         if (DrvDMA_OK == lRet)
         {
-            #ifdef _DEVICE_
-                DrvDMA_Device_Callback_Register(&lThis->mDrvDMA_Device, DrvDMA_CALLBACK_DEVICE_HARDWARE_PREPARE, nullptr, Hardware_Prepare, lThis);
-            #endif
-
             for (unsigned int i = 0; i < ADAPTER_QTY; i++)
             {
                 lResult = Adapter_Create(lDevice, lThis->mAdapters + i);
-                if (STATUS_SUCCESS == lResult)
-                {
-                    #ifdef _SOFT_FUNC_
-                        Adapter_Prepare(lThis->mAdapters[i]);
-                    #endif
-                }
-                else
+                if (STATUS_SUCCESS != lResult)
                 {
                     DbgPrintEx(DPFLTR_IHVDRIVER_ID, 0, __FUNCTION__ " - Adapter_Create( ,  ) failed - 0x%08x\n", lResult);
                     break;
@@ -137,23 +148,86 @@ NTSTATUS Device_Create(WDFDEVICE_INIT* aInit)
 // Static functions
 // //////////////////////////////////////////////////////////////////////////
 
-#ifdef _DEVICE_
+// ===== Entry points =======================================================
 
-    void Hardware_Prepare(void* aSender, DrvDMA_CallbackType aType, void* aContext)
+NTSTATUS D0Entry(WDFDEVICE aDevice, WDF_POWER_DEVICE_STATE aPreviousState)
+{
+    DbgPrintEx(DPFLTR_IHVDRIVER_ID, 0, __FUNCTION__ "( ,  )\n");
+
+    ASSERT(nullptr != aDevice);
+
+    NTSTATUS lResult = STATUS_SUCCESS;
+
+    #ifdef _DEVICE_
+        lResult = DrvDMA_D0Entry(aDevice, aPreviousState);
+    #endif
+
+    #ifdef _SOFT_FUNC_
+        (void)aPreviousState;
+    #endif
+
+    auto lThis = GetDeviceContext(aDevice);
+    ASSERT(nullptr != lThis);
+
+    for (unsigned int i = 0; i < ADAPTER_QTY; i++)
     {
-        DbgPrintEx(DPFLTR_IHVDRIVER_ID, 0, __FUNCTION__ "( , ,  )\n");
-
-        ASSERT(nullptr != aContext);
-
-        (void)aSender;
-        (void)aType;
-
-        auto lThis = reinterpret_cast<DeviceContext*>(aContext);
-
-        for (unsigned int i = 0; i < ADAPTER_QTY; i++)
-        {
-            Adapter_Prepare(lThis->mAdapters[i]);
-        }
+        Adapter_UpdateCurrentState(lThis->mAdapters[i]);
     }
 
-#endif
+    return lResult;
+}
+
+NTSTATUS D0Exit(WDFDEVICE aDevice, WDF_POWER_DEVICE_STATE aTargetState)
+{
+    DbgPrintEx(DPFLTR_IHVDRIVER_ID, 0, __FUNCTION__ "( ,  )\n");
+
+    ASSERT(nullptr != aDevice);
+
+    auto lThis = GetDeviceContext(aDevice);
+    ASSERT(nullptr != lThis);
+
+    for (unsigned int i = 0; i < ADAPTER_QTY; i++)
+    {
+        Adapter_UpdateUnknownState(lThis->mAdapters[i]);
+    }
+
+    NTSTATUS lResult = STATUS_SUCCESS;
+
+    #ifdef _DEVICE_
+        lResult = DrvDMA_D0Exit(aDevice, aTargetState);
+    #endif
+
+    #ifdef _SOFT_FUNC_
+        (void)aTargetState;
+    #endif
+
+    return lResult;
+}
+
+NTSTATUS PrepareHardware(WDFDEVICE aDevice, WDFCMRESLIST aRaw, WDFCMRESLIST aTranslated)
+{
+    DbgPrintEx(DPFLTR_IHVDRIVER_ID, 0, __FUNCTION__ "( , ,  )\n");
+
+    ASSERT(nullptr != aDevice);
+
+    NTSTATUS lResult = STATUS_SUCCESS;
+
+    #ifdef _DEVICE_
+        lResult = DrvDMA_PrepareHardware(aDevice, aRaw, aTranslated);
+    #endif
+
+    #ifdef _SOFT_FUNC_
+        (void)aRaw;
+        (void)aTranslated;
+    #endif
+
+    auto lThis = GetDeviceContext(aDevice);
+    ASSERT(nullptr != lThis);
+
+    for (unsigned int i = 0; i < ADAPTER_QTY; i++)
+    {
+        Adapter_Prepare(lThis->mAdapters[i]);
+    }
+
+    return lResult;
+}

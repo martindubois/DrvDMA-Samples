@@ -231,6 +231,8 @@ void SetNotificationEnable(NETPACKETQUEUE aQueue, BOOLEAN aEnabled)
 
     (void)aQueue;
     (void)aEnabled;
+
+    // NOTE  Here, the driver enable revice interrupt.
 }
 
 void Start(NETPACKETQUEUE aQueue)
@@ -238,6 +240,8 @@ void Start(NETPACKETQUEUE aQueue)
     DbgPrintEx(DPFLTR_IHVDRIVER_ID, 0, __FUNCTION__ "(  )\n");
 
     (void)aQueue;
+
+    // NOTE  Here, the driver start the receive queue
 }
 
 void Stop(NETPACKETQUEUE aQueue)
@@ -245,6 +249,8 @@ void Stop(NETPACKETQUEUE aQueue)
     DbgPrintEx(DPFLTR_IHVDRIVER_ID, 0, __FUNCTION__ "(  )\n");
 
     (void)aQueue;
+
+    // NOTE  Here, the driver stop the receive queue
 }
 
 void Destroy(WDFOBJECT aQueue)

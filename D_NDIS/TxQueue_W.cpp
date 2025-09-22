@@ -182,6 +182,8 @@ void SetNotificationEnable(NETPACKETQUEUE aQueue, BOOLEAN aEnabled)
 
     (void)aQueue;
     (void)aEnabled;
+
+    // NOTE  Here, the driver enable end of transmit interrupt.
 }
 
 void Start(NETPACKETQUEUE aQueue)
@@ -189,6 +191,8 @@ void Start(NETPACKETQUEUE aQueue)
     DbgPrintEx(DPFLTR_IHVDRIVER_ID, 0, __FUNCTION__ "(  )\n");
 
     (void)aQueue;
+
+    // NOTE  Here, the driver start the transmit queue.
 }
 
 void Stop(NETPACKETQUEUE aQueue)
@@ -196,6 +200,8 @@ void Stop(NETPACKETQUEUE aQueue)
     DbgPrintEx(DPFLTR_IHVDRIVER_ID, 0, __FUNCTION__ "(  )\n");
 
     (void)aQueue;
+
+    // NOTE  Here, the driver stop the transmit queue.
 }
 
 void Destroy(WDFOBJECT aQueue)

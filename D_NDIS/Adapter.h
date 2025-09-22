@@ -29,3 +29,9 @@ extern NTSTATUS Adapter_Create(WDFDEVICE aDevice, Adapter** aAdapter);
 
 // aAdapter  The Adapter instance
 extern void Adapter_Prepare(Adapter* aThis);
+
+// aAdapter  The Adapter instance
+extern void Adapter_UpdateCurrentState(Adapter* aThis);
+
+// aAdapter  The Adapter instance
+extern void Adapter_UpdateUnknownState(Adapter* aThis);

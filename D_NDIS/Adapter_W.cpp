@@ -26,8 +26,6 @@ WDF_DECLARE_CONTEXT_TYPE_WITH_NAME(Adapter, GetAdapter);
 // Static fonction declarations
 // //////////////////////////////////////////////////////////////////////////
 
-static void UpdateCurrentState(Adapter* aThis);
-
 // ===== Entry points =======================================================
 
 static EVT_NET_ADAPTER_CREATE_RXQUEUE CreateRxQueue;
@@ -128,17 +126,14 @@ void Adapter_Prepare(Adapter* aThis)
 
     Hardware_Prepare();
 
-    UpdateCurrentState(aThis);
+    Adapter_UpdateCurrentState(aThis);
 
     auto lStatus = NetAdapterStart(lAdapter);
     ASSERT(STATUS_SUCCESS == lStatus);
     (void)lStatus;
 }
 
-// Static functions
-// //////////////////////////////////////////////////////////////////////////
-
-void UpdateCurrentState(Adapter* aThis)
+void Adapter_UpdateCurrentState(Adapter* aThis)
 {
     DbgPrintEx(DPFLTR_IHVDRIVER_ID, 0, __FUNCTION__ "(  )\n");
 
@@ -161,6 +156,31 @@ void UpdateCurrentState(Adapter* aThis)
 
     NetAdapterSetLinkState(aThis->mAdapter, &lLinkState);
 }
+
+void Adapter_UpdateUnknownState(Adapter* aThis)
+{
+    DbgPrintEx(DPFLTR_IHVDRIVER_ID, 0, __FUNCTION__ "(  )\n");
+
+    ASSERT(nullptr != aThis->mAdapter);
+
+    auto lCurrentLinkSpeed_bit_s = NDIS_LINK_SPEED_UNKNOWN;
+    auto lDuplexMode             = MediaDuplexStateUnknown;
+    auto lFlags                  = NetAdapterAutoNegotiationFlagNone;
+    auto lPause                  = NetAdapterPauseFunctionTypeUnknown;
+    auto lMediaState             = MediaConnectStateUnknown;
+
+    ASSERT(3 > lDuplexMode);
+    ASSERT(2 > lMediaState);
+
+    NET_ADAPTER_LINK_STATE lLinkState;
+
+    NET_ADAPTER_LINK_STATE_INIT(&lLinkState, lCurrentLinkSpeed_bit_s, lMediaState, lDuplexMode, lPause, lFlags);
+
+    NetAdapterSetLinkState(aThis->mAdapter, &lLinkState);
+}
+
+// Static functions
+// //////////////////////////////////////////////////////////////////////////
 
 // ===== Entry points =======================================================
 
