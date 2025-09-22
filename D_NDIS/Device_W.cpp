@@ -39,7 +39,7 @@ typedef struct
     #endif
 
     #ifdef _SOFT_FUNC_
-        DrvDMA_SoftFunc mDrvDMA_SoftFunc;
+        DrvDMA_Func mDrvDMA_SoftFunc;
     #endif
 
     Adapter* mAdapters[ADAPTER_QTY];
@@ -87,7 +87,7 @@ NTSTATUS Device_Create(WDFDEVICE_INIT* aInit)
 
     #ifdef _SOFT_FUNC_
 
-        DrvDMA_SoftFunc_InitDeviceInit(aInit);
+        // TODO
 
     #endif
 
