@@ -3,7 +3,7 @@
 // Copyright (C) 2020-2024 KMS
 // License   http://www.apache.org/licenses/LICENSE-2.0
 // Product   DrvDMA
-// File      Sample_U_Simple/Sample_U_Simple.cpp
+// File      U_Simple/U_Simple.cpp
 
 #ifdef _WIN32
     #define _KMS_WINDOWS_
