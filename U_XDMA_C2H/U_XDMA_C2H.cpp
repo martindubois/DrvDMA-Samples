@@ -3,7 +3,7 @@
 // Copyright (C) 2025 KMS
 // License   http://www.apache.org/licenses/LICENSE-2.0
 // Product   DrvDMA
-// File      Sample_U_Simple/Sample_U_Simple.cpp
+// File      U_XDMA_C2H/U_XDMA_C2H.cpp
 
 #define _KMS_WINDOWS_
 
