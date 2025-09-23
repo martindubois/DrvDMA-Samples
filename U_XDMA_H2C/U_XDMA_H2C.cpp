@@ -75,10 +75,15 @@ int main()
             // to consider it as an handle to the DMA channel.
 
             // Step 4 - Allocating data buffer
-            auto lBuffer = new uint8_t[BUFFER_SIZE_byte];
+            // Buffer address must be aligned
+            auto lBuffer = new uint8_t[BUFFER_SIZE_byte + 64];
+
+            uint64_t lOffset_byte = 64 - (reinterpret_cast<uint64_t>(lBuffer) % 64);
+
+            auto lAligned = lBuffer + lOffset_byte;
 
             // Step 5 - Writting data into the buffer
-            memset(lBuffer, 0, BUFFER_SIZE_byte);
+            memset(lAligned, 0, BUFFER_SIZE_byte);
 
             // Step 6 - Prepare the electronic to receive data
             // Here, you must configure the user electronic present in the
@@ -101,7 +106,7 @@ int main()
             //    the DMA transfer in it.
             DrvDMA_Transfer_Status lTS;
 
-            lRet = lDD->Start(lCI, false, lBuffer, 0, HARDWARE_ADDRESS, BUFFER_SIZE_byte, &lTS);
+            lRet = lDD->Start(lCI, false, lAligned, 0, HARDWARE_ADDRESS, BUFFER_SIZE_byte, &lTS);
             if (DrvDMA_OK_PENDING == lRet)
             {
                 // Step 8 - Wait for the completion of the DMA transfer
