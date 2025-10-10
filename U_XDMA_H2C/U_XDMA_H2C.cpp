@@ -16,8 +16,10 @@
 // Configurations
 // //////////////////////////////////////////////////////////////////////////
 
+#define BAR_LOGICAL_INDEX (1)
+
 // CURRENT LIMITATION  DrvDMA currently limit transfer size to 32 MiB.
-#define BUFFER_SIZE_byte (16 * 1024 * 1024)
+#define BUFFER_SIZE_byte (16 * 1024)
 
 #define HARDWARE_ADDRESS (0x0000000000000000)
 
@@ -26,15 +28,15 @@
 
 int main()
 {
-    // Step 1 - Create an instance of the DrvDMA class
+    printf("Step 1 - Create an instance of the DrvDMA class.\n");
     auto lDD = DrvDMA::Create();
 
-    // Step 2 - Connect the DrvDMA instance with the driver.
+    printf("Step 2 - Connect the DrvDMA instance with the driver.\n");
     // The argument is the index of the driver instance.
     auto lRet = lDD->Connect(0);
     if (DrvDMA_OK == lRet)
     {
-        // Step 3 - Configure the DMA channel
+        printf("Step 3 - Configure the DMA channel.\n");
         // This sample configure the first H2C channel of a XDMA engine.
         // a. By setting mDescQty to 65536 we indicate to the driver to
         //    allocate space for 65536 descriptor. This is the maximum for a
@@ -61,7 +63,7 @@ int main()
         lCfg.mFlags.mExclusive = true;
         lCfg.mFlags.mKernel = true;
         lCfg.mFlags.mToDevice = true;
-        lCfg.mMem_Index = 1;
+        lCfg.mMem_Index = BAR_LOGICAL_INDEX;
         lCfg.mMem_Offset_byte = 0;
 
         unsigned int lCI;
@@ -74,7 +76,7 @@ int main()
             // the XDMA engine, this index can be any integer value. We need
             // to consider it as an handle to the DMA channel.
 
-            // Step 4 - Allocating data buffer
+            printf("Step 4 - Allocating data buffer.\n");
             // Buffer address must be aligned
             auto lBuffer = new uint8_t[BUFFER_SIZE_byte + 64];
 
@@ -82,14 +84,14 @@ int main()
 
             auto lAligned = lBuffer + lOffset_byte;
 
-            // Step 5 - Writting data into the buffer
+            printf("Step 5 - Writting data into the buffer.\n");
             memset(lAligned, 0, BUFFER_SIZE_byte);
 
-            // Step 6 - Prepare the electronic to receive data
+            printf("Step 6 - Prepare the electronic to receive data.\n");
             // Here, you must configure the user electronic present in the
             // FPGA. See the method Memory_GetAddress and Memory_GetSize
 
-            // Step 7 - Starting the DMA transfer
+            printf("Step 7 - Starting the DMA transfer.\n");
             // We could also use the Transfer method. This one start the
             // transfer and wait for its completion in a single method call.
             // There is some note about the arguments:
@@ -109,22 +111,22 @@ int main()
             lRet = lDD->Start(lCI, false, lAligned, 0, HARDWARE_ADDRESS, BUFFER_SIZE_byte, &lTS);
             if (DrvDMA_OK_PENDING == lRet)
             {
-                // Step 8 - Wait for the completion of the DMA transfer
+                printf("Step 8 - Wait for the completion of the DMA transfer.\n");
                 lRet = lDD->Wait(&lTS);
             }
 
-            // Step 9 - Release the data buffer
+            printf("Step 9 - Release the data buffer.\n");
             delete[] lBuffer;
         }
     }
+
+    printf("Step 10 - Delete the DrvDMA instance.\n");
+    lDD->Delete();
 
     if (DrvDMA_OK != lRet)
     {
         printf("Something got wrong (%s)\n", DrvDMA::GetResultName(lRet));
     }
-
-    // Step 10 - Delete the DrvDMA instance
-    lDD->Delete();
 
     return 0;
 }
