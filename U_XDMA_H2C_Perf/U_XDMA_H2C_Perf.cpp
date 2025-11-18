@@ -120,7 +120,7 @@ int main()
                 auto lB = lBuffers + (i % BUFFER_QTY);
 
                 lRet = lDD->Wait(&lB->mStatus);
-                if (DrvDMA_OK)
+                if (DrvDMA_OK != lRet)
                 {
                     printf("Something got wrong (%s)\n", DrvDMA::GetResultName(lRet));
                     exit(__LINE__);
