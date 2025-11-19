@@ -1,0 +1,5 @@
+-D_KMS_LINUX_
+-DDEBUG
+-O1
+-fpic
+-ggdb

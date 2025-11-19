@@ -5,7 +5,14 @@
 // Product   DrvDMA
 // File      U_XDMA_H2C/U_XDMA_H2C.cpp
 
-#define _KMS_WINDOWS_
+#ifdef _KMS_LINUX_
+    // ===== C ==============================================================
+    #include <stdint.h>
+    #include <stdlib.h>
+    #include <string.h>
+
+    #define _stricmp strcmp
+#endif
 
 #ifdef _KMS_WINDOWS_
     // ===== Windows ========================================================
@@ -70,7 +77,7 @@ static const RegInfo AMD_XDMA_REGS[] =
     { "C2H SGDMA 3  - ID", 0x00005300 },
 
     { "SGDMA Common - ID", 0x00006000 },
-    { "MSI-X        - ID", 0x00008000 },
+    { "MSI-X        - #0", 0x00008000 },
 
     { nullptr, 0 }
 };
@@ -79,6 +86,8 @@ static const RegInfo AMD_XDMA_REGS[] =
 // //////////////////////////////////////////////////////////////////////////
 
 static int AMD_XDMA(DrvDMA* aDD);
+
+static void BeginStep(unsigned int* aStep, const char* aDesc);
 
 static unsigned int Menu(const char** aMenu);
 
@@ -93,16 +102,18 @@ int main()
 {
     int lResult = __LINE__;
 
-    printf("Step 00 - Create an instance of the DrvDMA class.\n");
+    unsigned int lStep = 0;
+
+    BeginStep(&lStep, "Create an instance of the DrvDMA class");
     auto lDD = DrvDMA::Create();
     if (nullptr != lDD)
     {
-        printf("Step 01 - Retrieving library version\n");
+        BeginStep(&lStep, "Retrieving library version");
         DrvDMA_Version lVersions[3];
         auto lCount = lDD->Versions(lVersions);
         for (unsigned int i = 0; i < lCount; i++)
         {
-            printf("Version %u\n", i);
+            printf("    Version %u\t", i);
             DrvDMA::Display(stdout, lVersions[i]);
         }
         if (1 != lCount)
@@ -110,23 +121,23 @@ int main()
             printf("WARNING  DrvDMA::Versions failed - %u\n", lCount);
         }
 
-        printf("Step 02 - Verify the DrvDMA instance is not connected to the driver\n");
+        BeginStep(&lStep, "Verify the DrvDMA instance is not connected to the driver");
         auto lRetB = lDD->IsConnected();
         if (!lRetB)
         {
-            printf("Step 03 - Connect the DrvDMA instance with the driver.\n");
+            BeginStep(&lStep, "Connect the DrvDMA instance with the driver");
             auto lRet = lDD->Connect(DEVICE_INDEX);
             if (DrvDMA_OK == lRet)
             {
-                printf("Step 04 - Verify the DrvDMA instance is connected to the driver\n");
+                BeginStep(&lStep, "Verify the DrvDMA instance is connected to the driver");
                 lRetB = lDD->IsConnected();
                 if (lRetB)
                 {
-                    printf("Step 05 - Retrieve driver versions\n");
+                    BeginStep(&lStep, "Retrieve driver versions");
                     lCount = lDD->Versions(lVersions);
                     for (unsigned int i = 0; i < lCount; i++)
                     {
-                        printf("Version %u\n", i);
+                        printf("    Version %u\t", i);
                         DrvDMA::Display(stdout, lVersions[i]);
                     }
                     if (3 != lCount)
@@ -134,14 +145,14 @@ int main()
                         printf("WARNING  DrvDMA::Versions failed - %u\n", lCount);
                     }
 
-                    printf("Step 06 - Retrieve memory informations\n");
+                    BeginStep(&lStep, "Retrieve memory informations");
                     unsigned int lIndex = 0;
                     for (;;)
                     {
                         auto lSize_byte = lDD->Memory_GetSize(lIndex);
                         if (0 == lSize_byte)
                         {
-                            printf("%u memory regions\n", lIndex);
+                            printf("    %u memory regions\n", lIndex);
                             break;
                         }
                         if (0 != lSize_byte % 4096)
@@ -157,12 +168,22 @@ int main()
                         {
                             printf("WARNING  The memory region %u address is not valid\n", lIndex);
                         }
-                        printf("Memory region %u - 0x%016llx, %u bytes\n", lIndex, lAddress, lSize_byte);
+                        printf("    Memory region %u - ", lIndex);
+
+                        #ifdef _KMS_LINUX_
+                            printf("0x%016lx", lAddress);
+                        #endif
+
+                        #ifdef _KMS_WINDOWS_
+                            printf("0x%016llx", lAddress);
+                        #endif
+
+                        printf(", %u bytes\n", lSize_byte);
 
                         lIndex++;
                     }
 
-                    printf("Step 07 - Retrieve PCIe configuration space\n");
+                    BeginStep(&lStep, "Retrieve PCIe configuration space");
                     for (unsigned int i = 0; i < 9; i++)
                     {
                         uint32_t lValue;
@@ -172,7 +193,7 @@ int main()
                             printf("WARNING  DrvDMA::PCIeConfig_Read failed - %s\n", DrvDMA::GetResultName(lRet));
                             break;
                         }
-                        printf("0x%08x\n", lValue);
+                        printf("    0x%08x\n", lValue);
                     }
 
                     auto lChoice = Menu(MENU_DMA_ENGINE);
@@ -183,7 +204,8 @@ int main()
                     default: lResult = 0;
                     }
 
-                    printf("Step 98 - DrvDMA::Disconnecting\n");
+                    lStep = 98;
+                    BeginStep(&lStep, "DrvDMA::Disconnecting");
                     lRet = lDD->Disconnect();
                     if (DrvDMA_OK != lRet)
                     {
@@ -209,7 +231,8 @@ int main()
             lResult = __LINE__;
         }
 
-        printf("Step 99 - Deleting the DrvDMA instance\n");
+        lStep = 99;
+        BeginStep(&lStep, "Deleting the DrvDMA instance");
         lDD->Delete();
     }
     else
@@ -230,9 +253,11 @@ int main()
 
 int AMD_XDMA(DrvDMA* aDD)
 {
-    int lResult = __LINE__;
+    int lResult = 0;
 
-    printf("Step 10 - Identifying DMA control BAR\n");
+    unsigned int lStep = 10;
+
+    BeginStep(&lStep, "Identifying DMA control BAR");
     volatile uint32_t* lPtr;
     auto lSize_byte = aDD->Memory_GetSize(1);
     if (0 == lSize_byte)
@@ -257,6 +282,13 @@ int AMD_XDMA(DrvDMA* aDD)
     return lResult;
 }
 
+void BeginStep(unsigned int* aStep, const char* aDesc)
+{
+    printf("\n%02u - %s\n", *aStep, aDesc);
+
+    (*aStep)++;
+}
+
 unsigned int Menu(const char** aMenu)
 {
     unsigned int lCount = 0;
@@ -277,20 +309,22 @@ unsigned int Menu(const char** aMenu)
 
         char lLine[1024];
 
-        fgets(lLine, sizeof(lLine), stdin);
-
-        if (0 == _stricmp("A", lLine))
+        auto lRet = fgets(lLine, sizeof(lLine), stdin);
+        if (nullptr != lRet)
         {
-            printf("Aborting\n");
-            exit(__LINE__);
-        }
+            if (0 == _stricmp("A\n", lLine))
+            {
+                printf("Aborting\n");
+                exit(__LINE__);
+            }
 
-        char* lEnd;
+            char* lEnd;
 
-        lResult = strtoul(lLine, &lEnd, 10);
-        if (('0' > *lEnd) && (lCount > lResult))
-        {
-            break;
+            lResult = strtoul(lLine, &lEnd, 10);
+            if (('0' > *lEnd) && (lCount > lResult))
+            {
+                break;
+            }
         }
 
         printf("Invalid choice, try again\n");
@@ -305,19 +339,26 @@ void Pause()
 
     char lLine[1024];
 
-    fgets(lLine, sizeof(lLine), stdin);
+    auto lRet = fgets(lLine, sizeof(lLine), stdin);
+    (void)lRet;
 }
 
 void Registers(volatile uint32_t* aPtr, unsigned int aSize_byte, const RegInfo* aInfos)
 {
-    printf("Step 20 - Displaying identification registers\n");
+    unsigned int lStep = 20;
+
+    BeginStep(&lStep, "Displaying identification registers");
 
     unsigned int lIndex = 0;
     for (;;)
     {
         auto lInfo = aInfos + lIndex;
+        if (nullptr == lInfo->mName)
+        {
+            break;
+        }
 
-        printf("%s : ", lInfo->mName);
+        printf("    %s : ", lInfo->mName);
 
         if (aSize_byte >= (lInfo->mOffset_byte + sizeof(uint32_t)))
         {

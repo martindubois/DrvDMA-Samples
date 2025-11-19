@@ -7,4 +7,4 @@
 
     ===== Before compiling ==================================================
 
-Before compiling the DrvDMA samples, you must install DrvDMA 2.1.3-dev.
+Before compiling the DrvDMA samples, you must install DrvDMA 3.0.15-beta.
