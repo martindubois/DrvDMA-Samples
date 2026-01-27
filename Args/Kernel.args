@@ -1,0 +1,14 @@
+-D_KMS_KERNEL_
+-D_KMS_LINUX_
+-ffreestanding
+-fno-asynchronous-unwind-tables
+-fno-builtin
+-fno-exceptions
+-fno-pic
+-fno-stack-check
+-fno-rtti
+-funit-at-a-time
+-m64
+-mcmodel=kernel
+-nostdinc
+-O2

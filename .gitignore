@@ -17,4 +17,16 @@ x64/
 
 /Binaries/
 
+.Module.symvers.cmd
+.modules.order.cmd
+
+Module.symvers
+modules.order
+
+*.ko
+*.ko.cmd
+*.mod
+*.mod.c
+*.mod.cmd
 *.o
+*.o.cmd
