@@ -93,6 +93,10 @@ void Exit()
     printk(KERN_DEBUG PREFIX "%s()\n", __FUNCTION__);
 
     pci_unregister_driver(&sPciDriver);
+
+    unregister_chrdev_region(sChrDev, DEVICE_COUNT_MAX);
+
+    class_destroy(sClass);
 }
 
 module_exit(Exit);
@@ -103,7 +107,7 @@ int Init()
 
     printk(KERN_DEBUG PREFIX "%s()\n", __FUNCTION__);
 
-    sClass = class_create("DrvDMA");
+    sClass = class_create("D_Ethernet");
     if (NULL == sClass)
     {
         printk(KERN_ERR PREFIX "%s - class_create(  ) failed", __FUNCTION__);
@@ -178,6 +182,8 @@ int Probe(struct pci_dev * aPciDev, const struct pci_device_id * aId)
         return -ENOMEM;
     }
 
+    pci_set_drvdata(aPciDev, lNetDev);
+
     Adapter* lAdapter = netdev_priv(lNetDev);
 
     lAdapter->mNetDev = lNetDev;
@@ -192,6 +198,14 @@ void Remove(struct pci_dev * aPciDev)
     printk(KERN_DEBUG PREFIX "%s(  )\n", __FUNCTION__);
 
     DrvDMA_Device* lDevice = DrvDMA_Device_Find(aPciDev);
+
+    struct net_device* lNetDev = pci_get_drvdata(aPciDev);
+
+    Adapter* lAdapter = netdev_priv(lNetDev);
+
+    Adapter_Destroy(lAdapter);
+
+    free_netdev(lNetDev);
 
     DrvDMA_Device_ReleaseHardware(lDevice);
 

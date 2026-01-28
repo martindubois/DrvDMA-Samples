@@ -24,3 +24,5 @@ Adapter;
 // //////////////////////////////////////////////////////////////////////////
 
 extern void Adapter_Create(Adapter* aThis, struct pci_dev* aPciDev);
+
+extern void Adapter_Destroy(Adapter* aThis);

@@ -96,6 +96,13 @@ void Adapter_Create(Adapter* aThis, struct pci_dev* aPciDev)
     }
 }
 
+void Adapter_Destroy(Adapter* aThis)
+{
+    printk(KERN_DEBUG PREFIX "%s( ,  )\n", __FUNCTION__);
+
+    unregister_netdev(aThis->mNetDev);
+}
+
 // Static functions
 // //////////////////////////////////////////////////////////////////////////
 
