@@ -7,9 +7,16 @@
 
 #pragma once
 
+// ===== Linux kernel =======================================================
+#include <linux/mii.h>
+#include <linux/pci.h>
+
 typedef struct
 {
-    struct net_device * mNetDev;
+    struct net_device* mNetDev;
+    struct pci_dev   * mPciDev;
+
+    uint32_t mMsgLevel;
 }
 Adapter;
 
