@@ -17,6 +17,8 @@
 // Constants
 // //////////////////////////////////////////////////////////////////////////
 
+static const uint8_t ETHERNET_ADDRESS[] = { 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b };
+
 #define WATCHDOG_tick (2 * HZ)
 
 // Static function declarations
@@ -87,6 +89,9 @@ void Adapter_Create(Adapter* aThis, struct pci_dev* aPciDev)
     lNetDev->watchdog_timeo = WATCHDOG_tick;
 
     strscpy(lNetDev->name, "eth%d");
+
+    // NOTE  Use a real ethernet address
+    eth_hw_addr_set(lNetDev, ETHERNET_ADDRESS);
 
     int lRet = register_netdev(lNetDev);
     if (0 != lRet)
