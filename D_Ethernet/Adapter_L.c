@@ -17,7 +17,7 @@
 // Constants
 // //////////////////////////////////////////////////////////////////////////
 
-static const uint8_t ETHERNET_ADDRESS[] = { 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b };
+static const uint8_t ETHERNET_ADDRESS[] = { 0x04, 0x05, 0x06, 0x07, 0x08, 0x09 };
 
 #define WATCHDOG_tick (2 * HZ)
 
