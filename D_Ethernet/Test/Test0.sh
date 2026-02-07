@@ -3,16 +3,19 @@
 # Author    KMS - Martin Dubois, P. Eng.
 # Copyright (C) 2026 KMS
 # License   http://www.apache.org/licenses/LICENSE-2.0
-# Product   DrvDMS-Sample
+# Product   DrvDMA-Sample
 # File      D_Ethernet/Test/Test0.sh
 
 echo Executing  Test.sh  ...
+
+# ===== Functions ===========================================================
 
 test_exist () {
     echo - $1
 
     if [ ! -e $1 ] ; then
         echo ERROR  $1  does not exist
+        read -p "Press ENTER to continue" RESPONSE
     fi
 }
 
@@ -30,9 +33,11 @@ test_ls () {
     echo
 }
 
+# ===== Execution ===========================================================
+
 echo ----- 0. /dev ----------------------------------------------------------
 
-echo 0.a /dev/DrvDMA0
+echo --- 0.a /dev/DrvDMA0 ---
 
 test_ls /dev/DrvDMA0
 read -p "INSTRUCTION Verify the dev node is listed, note the major number and press ENTER" RESPONSE
@@ -217,5 +222,5 @@ ip -c -d -s link
 
 read -p "INSTRUCTION For the eth0 link, verify the MTU (1500), the Ethernet address (04:05:06:07:08:09) and the broadcast address (ff:ff:ff:ff:ff:ff), and press ENTER" RESPONSE
 
-# ===== End =====
+# ===== End =================================================================
 echo OK
