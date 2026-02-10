@@ -1,6 +1,6 @@
 
 # Author    KMS - Martin Dubois, P. Eng.
-# Copyright (C) 2025 KMS
+# Copyright (C) 2025-2026 KMS
 # License   http://www.apache.org/licenses/LICENSE-2.0
 # Product   DrvDMA-Samples
 # File      D_Ethernet/Makefile
@@ -11,17 +11,13 @@ obj-m += D_Ethernet.o
 
 D_Ethernet-objs := \
     Adapter_L.o    \
+	Device_L.o     \
 	Driver_L.o     \
 	DrvDMA_Glue.o
 
 ccflags-y := -D_KMS_LINUX_ -I /usr/local/DrvDMA-3.0/inc
 
 ldflags-y := --whole-archive /usr/src/DrvDMA-3.0/DrvDMA_K.a
-
-# ===== Rules ===============================================================
-
-# .cpp.o:
-#	g++ -c $(CFLAGS) -o $@ $<
 
 # ===== Targets =============================================================
 

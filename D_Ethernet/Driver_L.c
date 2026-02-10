@@ -1,6 +1,6 @@
 
 // Author    KMS - Martin Dubois, P. Eng.
-// Copyright (C) 2025 KMS
+// Copyright (C) 2025-2026 KMS
 // License   http://www.apache.org/licenses/LICENSE-2.0
 // Product   DrvDMS-Sample
 // File      D_Ethernet/Driver_L.c
@@ -9,14 +9,13 @@
 
 // ===== Linux kernel =======================================================
 #include <linux/module.h>
-#include <linux/etherdevice.h>
 #include <linux/pci.h>
 
 // ===== DrvDMA =============================================================
 #include <DrvDMA_K_Linux.h>
 
 // ===== Local ==============================================================
-#include "Adapter.h"
+#include "Device_L.h"
 
 // Constants
 // //////////////////////////////////////////////////////////////////////////
@@ -44,20 +43,11 @@ static char * DevNode(const struct device * aDev, umode_t * aMode);
 static void __exit Exit(void);
 static int  __init Init(void);
 
-static int  Probe (struct pci_dev * aPciDev, const struct pci_device_id * aId);
-static void Remove(struct pci_dev * aPciDev);
+static int  Probe (struct pci_dev * aDev, const struct pci_device_id * aId);
+static void Remove(struct pci_dev * aDev);
 
 // Static variables
 // //////////////////////////////////////////////////////////////////////////
-
-static struct file_operations sOperations =
-{
-    .owner          = THIS_MODULE,
-    .open           = (void *)DrvDMA_Open,
-    .mmap           = (void *)DrvDMA_MMap,
-    .release        = (void *)DrvDMA_Release,
-    .unlocked_ioctl = (void *)DrvDMA_IoCtl,
-};
 
 static struct pci_driver sPciDriver =
 {
@@ -71,14 +61,12 @@ static dev_t sChrDev;
 
 static struct class * sClass = NULL;
 
-static unsigned int sDeviceCount = 0;
-
 // Static functions
 // //////////////////////////////////////////////////////////////////////////
 
 // ===== Entry points =======================================================
 
-char * DevNode(const struct device * aDev, umode_t * aMode)
+char* DevNode(const struct device * aDev, umode_t * aMode)
 {
     if (NULL != aMode)
     {
@@ -145,71 +133,18 @@ int Init()
 
 module_init(Init);
 
-int Probe(struct pci_dev * aPciDev, const struct pci_device_id * aId)
+int Probe(struct pci_dev * aDev, const struct pci_device_id *)
 {
-    static const DrvDMA_Version VERSION = { 1, 0, 0, 0, "D_Ethernet.ko", "sample" };
-
     printk(KERN_DEBUG PREFIX "%s( ,  )\n", __FUNCTION__);
 
-    unsigned int lMinor = MINOR(sChrDev) + sDeviceCount;
-    dev_t        lDevId = MKDEV(MAJOR(sChrDev), lMinor);
-
-    DrvDMA_Device* lDevice = DrvDMA_Device_Create(aPciDev, lDevId, lMinor, sDeviceCount, sClass, &sOperations);
-    if (NULL == lDevice)
-    {
-        printk(KERN_ERR PREFIX "%s - DrvDMA_Device_Create failed\n", __FUNCTION__);
-        return - __LINE__;
-    }
-
-    DrvDMA_Device_SetDriverVersion(lDevice, &VERSION);
-
-    DrvDMA_Result lRet = DrvDMA_Device_PrepareHardware(lDevice);
-    if (DrvDMA_OK != lRet)
-    {
-        printk(KERN_ERR PREFIX "%s - DrvDMA_Device_PrepareHardware(  ) failed - %u\n", __FUNCTION__, lRet);
-        DrvDMA_Device_Delete(lDevice);
-        return - __LINE__;
-    }
-
-    sDeviceCount++;
-
-    struct net_device * lNetDev = alloc_etherdev(sizeof(Adapter));
-    if (NULL == lNetDev)
-    {
-        printk(KERN_ERR PREFIX "%s - ENOMEM\n", __FUNCTION__);
-        DrvDMA_Device_ReleaseHardware(lDevice);
-        DrvDMA_Device_Delete(lDevice);
-        return -ENOMEM;
-    }
-
-    pci_set_drvdata(aPciDev, lNetDev);
-
-    Adapter* lAdapter = netdev_priv(lNetDev);
-
-    lAdapter->mNetDev = lNetDev;
-
-    Adapter_Create(lAdapter, aPciDev);
-    
-    return 0;
+    return Device_Create(aDev, MAJOR(sChrDev), MINOR(sChrDev), sClass);
 }
 
-void Remove(struct pci_dev * aPciDev)
+void Remove(struct pci_dev * aDev)
 {
     printk(KERN_DEBUG PREFIX "%s(  )\n", __FUNCTION__);
 
-    DrvDMA_Device* lDevice = DrvDMA_Device_Find(aPciDev);
-
-    struct net_device* lNetDev = pci_get_drvdata(aPciDev);
-
-    Adapter* lAdapter = netdev_priv(lNetDev);
-
-    Adapter_Destroy(lAdapter);
-
-    free_netdev(lNetDev);
-
-    DrvDMA_Device_ReleaseHardware(lDevice);
-
-    DrvDMA_Device_Delete(lDevice);
+    Device_Destroy(aDev);
 }
 
 // License

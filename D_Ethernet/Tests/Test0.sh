@@ -4,7 +4,7 @@
 # Copyright (C) 2026 KMS
 # License   http://www.apache.org/licenses/LICENSE-2.0
 # Product   DrvDMA-Sample
-# File      D_Ethernet/Test/Test0.sh
+# File      D_Ethernet/Tests/Test0.sh
 
 echo Executing  Test.sh  ...
 

@@ -7,6 +7,11 @@
 
 #pragma once
 
+// ===== Linux ==============================================================
+#include <linux/interrupt.h>
+#include <linux/types.h>
+#include <linux/wait.h>
+
 // Constants
 // //////////////////////////////////////////////////////////////////////////
 
