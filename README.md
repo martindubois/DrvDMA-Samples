@@ -9,18 +9,26 @@
 
 Before compiling the DrvDMA samples, you must install DrvDMA 3.0.17-beta.
 
-Before compiling the D_Ethernet samples on Linux, you must copy DrvDMA_Glue.c
-from the source folder (usr/src/DrvDMA-3.0) to the sample folder.
+Before compiling the D_Ethernet or D_SoftFunc_L samples on Linux, you must
+copy DrvDMA_Glue.c from the source folder (var/lib/dkms/DrvDMA/3.0/source) to
+the sample folder.
 
     ===== Samples summary ===================================================
 
     D_Ethernet
 
-This sample is a very simple Linux NIC driver using DrvDMA library.
+This sample is a very simple Linux NIC driver using DrvDMA library. This
+sample is for Linux only.
 
     D_NDIS
 
-This sample is a very simple Windows NIC driver using DrvDMA library.
+This sample is a very simple Windows NIC driver using DrvDMA library. This
+sample is for Windows only.
+
+    D_SoftFunc_L
+
+This sample is an empty software function driver on Linux. This sample if for
+Linux only.
 
     U_BAR
 
@@ -35,7 +43,7 @@ installing the DrvDMA driver.
     U_Test
 
 This sample is a test program you can use to test the DrvDMA driver
-installation and configuration.
+installation and configuration. This sample is for Linux and Windows.
 
     U_XDMA_C2H
 
