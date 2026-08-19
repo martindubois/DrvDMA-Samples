@@ -17,6 +17,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "U_XDMA_H2C_Perf", "U_XDMA_H
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "U_Test", "U_Test\U_Test.vcxproj", "{AB79530A-193A-43D4-9AE3-274DD6F88767}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "U_Int", "U_Int\U_Int.vcxproj", "{657F8DF0-B157-4296-9E3A-1F7D4AC91085}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -85,6 +87,14 @@ Global
 		{AB79530A-193A-43D4-9AE3-274DD6F88767}.Release|x64.Build.0 = Release|x64
 		{AB79530A-193A-43D4-9AE3-274DD6F88767}.Release|x86.ActiveCfg = Release|Win32
 		{AB79530A-193A-43D4-9AE3-274DD6F88767}.Release|x86.Build.0 = Release|Win32
+		{657F8DF0-B157-4296-9E3A-1F7D4AC91085}.Debug|x64.ActiveCfg = Debug|x64
+		{657F8DF0-B157-4296-9E3A-1F7D4AC91085}.Debug|x64.Build.0 = Debug|x64
+		{657F8DF0-B157-4296-9E3A-1F7D4AC91085}.Debug|x86.ActiveCfg = Debug|Win32
+		{657F8DF0-B157-4296-9E3A-1F7D4AC91085}.Debug|x86.Build.0 = Debug|Win32
+		{657F8DF0-B157-4296-9E3A-1F7D4AC91085}.Release|x64.ActiveCfg = Release|x64
+		{657F8DF0-B157-4296-9E3A-1F7D4AC91085}.Release|x64.Build.0 = Release|x64
+		{657F8DF0-B157-4296-9E3A-1F7D4AC91085}.Release|x86.ActiveCfg = Release|Win32
+		{657F8DF0-B157-4296-9E3A-1F7D4AC91085}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

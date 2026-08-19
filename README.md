@@ -15,45 +15,48 @@ the sample folder.
 
     ===== Samples summary ===================================================
 
-    D_Ethernet
+    D_Ethernet - Linux - No DMA engine used
 
-This sample is a very simple Linux NIC driver using DrvDMA library. This
-sample is for Linux only.
+This sample is a very simple Linux NIC driver using DrvDMA library.
 
-    D_NDIS
+    D_NDIS - Windows - No DMA engine used
 
-This sample is a very simple Windows NIC driver using DrvDMA library. This
-sample is for Windows only.
+This sample is a very simple Windows NIC driver using DrvDMA library and the
+NetAdapterCx framework.
 
-    D_SoftFunc_L
+    D_SoftFunc_L - Linux - No DMA engine used
 
-This sample is an empty software function driver on Linux. This sample if for
-Linux only.
+This sample is an empty software function driver on Linux.
 
-    U_BAR
+    U_BAR - Windows - No DMA engine used
 
 This sample is a very simple program using DrvDMA library and DrvDMA driver
 to access registers of a PCIe device.
 
-    U_Simple
+    U_Int - Windows
+
+This sample measures the delay between an interrupt and the call of the user
+mode callback.
+
+    U_Simple - Linux and Windows - No DMA engine used
 
 This sample is a very simple program using DrvDMA library you can run without
 installing the DrvDMA driver.
 
-    U_Test
+    U_Test - Linux and Windows
 
 This sample is a test program you can use to test the DrvDMA driver
-installation and configuration. This sample is for Linux and Windows.
+installation and configuration.
 
-    U_XDMA_C2H
+    U_XDMA_C2H - Windows - AMD (Xilinx) XDMA
 
 This sample configure a C2H XDMA channel and transfer data.
 
-    U_XDMA_H2C
+    U_XDMA_H2C - Windows - AMD (Xilinx) XDMA
 
 This sample configure a H2C XDMA channel and transfer data.
 
-    U_XDMA_H2C_Perf
+    U_XDMA_H2C_Perf - Windows - AMD (Xilinx) XDMA
 
 This sample configure a H2C XDMA channel and transfer data measuing
 performance.
